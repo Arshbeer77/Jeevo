@@ -1,0 +1,113 @@
+/* ============================================================
+   JEEVO — SMALL DELIGHTS
+   Everything here is travel- or India-specific. Nothing generic,
+   nothing that fires more than once, nothing that blocks reading.
+   ============================================================ */
+
+/* ---------- 1. a plane flies the scroll bar ---------- */
+.jv-progress{ overflow:visible }
+.jv-flyer{
+  position:fixed;
+  top:-13px;
+  left:0;
+  z-index:1201;
+  width:31px;
+  height:31px;
+  pointer-events:none;
+  color:#5A2D0C;
+  transform:translateX(-50%);
+  opacity:0;
+  transition:opacity .4s ease;
+  filter:drop-shadow(0 1px 2px rgba(90,45,12,.28));
+}
+.jv-flyer.is-on{ opacity:1 }
+
+/* a short contrail so it reads as flying, not sitting */
+.jv-flyer::after{
+  content:"";
+  position:absolute;
+  top:50%;
+  right:70%;
+  width:34px;
+  height:2px;
+  border-radius:2px;
+  background:linear-gradient(270deg, rgb(var(--jv-rgb-a,245,166,35)), transparent);
+  transform:translateY(-50%);
+  opacity:.85;
+}
+.jv-flyer svg{ width:100%; height:100%; display:block }
+
+/* ---------- 2. passport stamp on a card ---------- */
+.jv-stampable{ position:relative; overflow:hidden }
+.jv-stamp{
+  position:absolute;
+  top:16px; right:14px;
+  width:112px; height:112px;
+  pointer-events:none;
+  opacity:0;
+  transform:rotate(-18deg) scale(1.6);
+  transition:opacity .28s ease, transform .28s cubic-bezier(.2,.9,.3,1.1);
+  z-index:3;
+  color:rgb(var(--jv-rgb-a,245,166,35));
+  mix-blend-mode:multiply;
+}
+.jv-stampable:hover .jv-stamp,
+.jv-stampable:focus-within .jv-stamp{
+  opacity:.78;
+  transform:rotate(-13deg) scale(1);
+}
+.jv-stamp svg{ width:100%; height:100% }
+
+/* ---------- 3. the nav globe turns when you hover the logo ---------- */
+.nav-logo:hover .jv-logo__globe .jv-spin{
+  animation:jvSpin 5.5s linear infinite;
+}
+
+/* ---------- 4. the kite ---------- */
+.jv-kite{
+  position:fixed;
+  z-index:1400;
+  width:82px;
+  pointer-events:none;
+  will-change:transform;
+}
+.jv-kite svg{ width:100%; height:auto; display:block }
+.jv-kite__tail{
+  transform-origin:50% 0;
+  animation:jvTail 1.15s ease-in-out infinite;
+}
+@keyframes jvTail{
+  0%,100%{ transform:rotate(-7deg) }
+  50%    { transform:rotate(7deg) }
+}
+
+/* ---------- 5. shubh yatra on a completed booking ---------- */
+.jv-yatra{
+  display:block;
+  margin-top:6px;
+  font-family:'Mukta',system-ui,sans-serif;
+  font-size:11px;
+  letter-spacing:.34em;
+  text-indent:.34em;
+  text-transform:uppercase;
+  color:rgb(var(--jv-rgb-a,245,166,35));
+}
+.jv-yatra i{
+  display:block;
+  font-family:'Kohinoor Devanagari','Devanagari Sangam MN','Noto Sans Devanagari',
+              'Nirmala UI',system-ui,sans-serif;
+  font-style:normal;
+  font-size:19px;
+  letter-spacing:0;
+  text-indent:0;
+  text-transform:none;
+  color:#5A2D0C;
+  margin-bottom:3px;
+}
+
+@media (prefers-reduced-motion:reduce){
+  .jv-flyer,.jv-kite{ display:none }
+  .jv-stamp{ transition:none }
+  .jv-kite__tail{ animation:none }
+  .nav-logo:hover .jv-logo__globe .jv-spin{ animation:none }
+}

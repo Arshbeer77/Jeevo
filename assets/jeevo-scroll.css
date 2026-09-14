@@ -1,0 +1,102 @@
+/* ============================================================
+   JEEVO — "COLOURS OF INDIA" SCROLL
+   An ambient wash that shifts through real Indian pigments as
+   you move down the page, plus staggered reveals.
+   ============================================================ */
+
+/* body was opaque white, so a z-index:-1 wash painted into a void.
+   The page ground now lives on <html>; body lets the wash through. */
+html{ background:#FFFDF8 }
+body{ background:transparent !important }
+
+.jv-wash{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(125% 85% at 10% 0%,   rgba(var(--jv-rgb-a,245,166,35), .30) 0%, transparent 60%),
+    radial-gradient(115% 80% at 90% 15%,  rgba(var(--jv-rgb-b,232,134,46), .24) 0%, transparent 58%),
+    radial-gradient(140% 90% at 50% 100%, rgba(var(--jv-rgb-a,245,166,35), .16) 0%, transparent 62%),
+    #FFFDF8;
+  transition:background 1.2s ease-out;
+}
+
+/* the alternating pale sections pick up the pigment too, so the colour
+   is actually on the page rather than hiding behind it */
+section{ background-color:transparent !important; position:relative }
+/* No transition here on purpose: changing a custom property does not
+   reliably re-trigger a transition on a property derived from it, which
+   left this frozen on the pigment it had at page load. The wash behind
+   already cross-fades, so the change still reads as gradual. */
+section:nth-of-type(even){
+  background-color:rgba(var(--jv-rgb-a,245,166,35), .06) !important;
+}
+
+/* section headings take the live pigment */
+.section-tag, .section-header .section-tag{
+  color:rgb(var(--jv-rgb-a,245,166,35)) !important;
+  transition:color 1.2s ease-out;
+}
+
+/* scroll progress, tinted to the section you are in */
+.jv-progress{
+  position:fixed;
+  top:0; left:0;
+  height:4px;
+  width:0%;
+  z-index:1200;
+  background:var(--jv-hue-a, #F5A623);
+  transition:background .9s ease-out;
+  pointer-events:none;
+}
+
+/* the pigment name, bottom-left */
+.jv-pigment{
+  position:fixed;
+  left:22px; bottom:22px;
+  z-index:1150;
+  display:flex;
+  align-items:center;
+  gap:9px;
+  padding:7px 13px 7px 9px;
+  border-radius:999px;
+  background:rgba(255,253,248,.82);
+  backdrop-filter:blur(8px);
+  border:1px solid rgba(90,45,12,.13);
+  font-family:'Mukta',system-ui,sans-serif;
+  font-size:10.5px;
+  letter-spacing:.17em;
+  text-transform:uppercase;
+  color:#5A2D0C;
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .45s ease, transform .45s ease;
+  pointer-events:none;
+}
+.jv-pigment.is-on{opacity:1;transform:translateY(0)}
+.jv-pigment i{
+  width:13px; height:13px;
+  border-radius:50%;
+  background:var(--jv-hue-a, #F5A623);
+  transition:background .9s ease-out;
+  box-shadow:0 0 0 3px rgba(255,253,248,.9);
+}
+@media (max-width:700px){ .jv-pigment{display:none} }
+
+/* ---- staggered reveals ---- */
+.jv-rise{
+  opacity:0;
+  transform:translateY(22px);
+  transition:opacity .62s cubic-bezier(.22,.61,.36,1),
+             transform .62s cubic-bezier(.22,.61,.36,1);
+  will-change:opacity, transform;
+}
+.jv-rise.is-in{opacity:1;transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  .jv-wash{transition:none}
+  .jv-rise{opacity:1 !important;transform:none !important;transition:none}
+  .jv-pigment{display:none}
+  .jv-progress{transition:none}
+}

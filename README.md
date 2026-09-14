@@ -99,7 +99,7 @@ All images are from Unsplash and should load properly:
 ### 🎨 Design Features
 
 - **Color Scheme**: Saffron/Orange (Indian theme)
-- **Fonts**: Playfair Display (headings) + Poppins (body)
+- **Fonts**: Rozha One (display) + Martel (body) + Mukta (UI)
 - **Icons**: Font Awesome 6.5.1
 - **Animations**: Smooth transitions throughout
 - **Responsive**: Mobile, tablet, desktop optimized

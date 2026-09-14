@@ -1,0 +1,89 @@
+/* ============================================================
+   JEEVO — FLOURISH
+   ============================================================ */
+
+/* ---------- 1. the Ashoka Chakra ----------
+   Readability first: it sits in the right-hand gutter beside the content
+   column, not behind it, at low opacity, with no blend mode that could
+   darken text. Below 1200px there is no gutter, so it is hidden. */
+.jv-chakra{
+  position:fixed;
+  top:50%;
+  right:-13vw;
+  width:min(46vw,480px);
+  aspect-ratio:1;
+  transform:translateY(-50%);
+  z-index:-1;
+  pointer-events:none;
+  color:#0B4EA2;
+  opacity:0;
+  transition:opacity 1s ease;
+}
+.jv-chakra.is-on{ opacity:.07 }
+.jv-chakra svg{ width:100%; height:100%; display:block }
+.jv-chakra__turn{ transform-origin:200px 200px }
+
+/* no gutter to live in on narrower screens, so it steps aside entirely */
+@media (max-width:1200px){ .jv-chakra{ display:none } }
+
+/* ---------- 2. the city ribbon ---------- */
+.jv-ribbon{
+  position:relative;
+  overflow:hidden;
+  padding:20px 0;
+  margin:0;
+  background:rgb(var(--jv-rgb-a,245,166,35));
+  border-top:1px solid rgba(90,45,12,.14);
+  border-bottom:1px solid rgba(90,45,12,.14);
+  user-select:none;
+}
+.jv-ribbon__track{
+  display:flex;
+  align-items:center;
+  gap:34px;
+  width:max-content;
+  animation:jvRibbon 46s linear infinite;
+}
+.jv-ribbon:hover .jv-ribbon__track{ animation-play-state:paused }
+@keyframes jvRibbon{
+  from{ transform:translateX(0) }
+  to  { transform:translateX(-50%) }
+}
+.jv-city{
+  display:inline-flex;
+  align-items:baseline;
+  gap:11px;
+  font-family:'Mukta',system-ui,sans-serif;
+  font-size:14px;
+  font-weight:600;
+  letter-spacing:.26em;
+  text-transform:uppercase;
+  color:#FFFDF8;
+  white-space:nowrap;
+}
+.jv-city b{
+  font-family:'Kohinoor Devanagari','Devanagari Sangam MN','Noto Sans Devanagari',
+              'Nirmala UI',system-ui,sans-serif;
+  font-size:26px;
+  font-weight:400;
+  letter-spacing:0;
+  text-transform:none;
+  color:#FFFDF8;
+  opacity:.95;
+}
+.jv-sep{ color:rgba(255,253,248,.55); font-size:15px }
+
+/* ---------- 3. headings wipe in ---------- */
+.jv-wipe{
+  clip-path:inset(0 100% 0 0);
+  opacity:.001;
+  transition:clip-path 1s cubic-bezier(.16,.84,.3,1),
+             opacity .45s ease;
+}
+.jv-wipe.is-in{ clip-path:inset(0 0 0 0); opacity:1 }
+
+@media (prefers-reduced-motion:reduce){
+  .jv-mandala{ display:none }
+  .jv-ribbon__track{ animation:none }
+  .jv-wipe{ clip-path:none !important; opacity:1 !important; transition:none }
+}

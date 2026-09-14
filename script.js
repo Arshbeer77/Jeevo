@@ -129,27 +129,7 @@ if (heroSection) {
     heroObserver.observe(heroSection);
 }
 
-// ========== SCROLL ANIMATIONS ==========
-const animateOnScroll = document.querySelectorAll('.package-card, .dest-card, .testimonial-card, .gallery-item');
-
-const scrollObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.opacity = '1';
-            entry.target.style.transform = 'translateY(0)';
-        }
-    });
-}, {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-});
-
-animateOnScroll.forEach(element => {
-    element.style.opacity = '0';
-    element.style.transform = 'translateY(30px)';
-    element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    scrollObserver.observe(element);
-});
+// scroll reveals: handled in assets/jeevo-scroll.js
 
 // ========== BACK TO TOP BUTTON ==========
 const backToTop = document.getElementById('backToTop');
@@ -163,43 +143,88 @@ window.addEventListener('scroll', () => {
 });
 
 // ========== CONTACT FORM HANDLING ==========
+/* ============================================================
+   CONTACT FORM  —  Web3Forms with a mailto fallback
+   ------------------------------------------------------------
+   SETUP (2 minutes, free, no account needed):
+     1. Go to https://web3forms.com
+     2. Enter the inbox that should receive enquiries
+     3. They email you an Access Key - paste it below
+   Until a key is set, the form falls back to opening the
+   visitor's email client addressed to CONTACT_EMAIL.
+   ============================================================ */
+const _JV = (window.JEEVO_CONFIG || {});
+const WEB3FORMS_KEY   = _JV.web3formsKey || "";
+const CONTACT_EMAIL   = _JV.contactEmail || "hello@jeevotours.com";
+const WHATSAPP_NUMBER = (_JV.whatsapp || "").replace(/[^0-9]/g, "");
+
 const contactForm = document.getElementById('contactForm');
 
 if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
+    contactForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Get form data
-        const formData = new FormData(contactForm);
-        const data = Object.fromEntries(formData);
+        if (!contactForm.checkValidity()) { contactForm.reportValidity(); return; }
 
-        // Show success message (you can replace this with actual form submission)
-        alert('Thank you for your enquiry! We will get back to you within 24 hours.');
+        const btn = document.getElementById('contactSubmit');
+        const original = btn ? btn.innerHTML : '';
+        if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...'; }
 
-        // Reset form
-        contactForm.reset();
+        const d = {};
+        new FormData(contactForm).forEach((v, k) => { d[k] = v; });
+        const subject = 'Jeevo enquiry - ' + (d.reason || 'General') + ' - ' + (d.name || '');
 
-        // In production, you would send this data to a server:
-        // fetch('/api/contact', {
-        //     method: 'POST',
-        //     headers: { 'Content-Type': 'application/json' },
-        //     body: JSON.stringify(data)
-        // });
+        function succeeded(name) {
+            const first = name ? ' ' + name.trim().split(' ')[0] : '';
+            contactForm.outerHTML =
+                '<div class="form-success">' +
+                  '<i class="fas fa-circle-check"></i>' +
+                  '<h3>Thank you' + first + '</h3>' +
+                  '<p>We have got your enquiry and will reply within 24 hours. ' +
+                  'If it is urgent, message us on WhatsApp and we will pick it up faster.</p>' +
+                  '<a class="btn btn-whatsapp" target="_blank" rel="noopener" ' +
+                     'href="https://wa.me/' + WHATSAPP_NUMBER + '?text=' +
+                     encodeURIComponent('Hi Jeevo, I just sent an enquiry through your website.') + '">' +
+                     '<i class="fab fa-whatsapp"></i> Message us on WhatsApp</a>' +
+                '</div>';
+        }
+
+        // 1) try Web3Forms
+        if (WEB3FORMS_KEY) {
+            try {
+                const r = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify(Object.assign({
+                        access_key: WEB3FORMS_KEY,
+                        subject: subject,
+                        from_name: 'Jeevo website',
+                        replyto: d.email
+                    }, d))
+                });
+                if (r.ok) { succeeded(d.name); return; }
+            } catch (_) { /* fall through to mailto */ }
+        }
+
+        // 2) fallback - open the visitor's mail client with everything filled in
+        const body =
+            'Name: ' + (d.name || '-') + '\n' +
+            'Phone: ' + (d.phone || '-') + '\n' +
+            'Email: ' + (d.email || '-') + '\n' +
+            'Reason: ' + (d.reason || '-') + '\n\n' +
+            (d.message || '');
+        window.location.href = 'mailto:' + CONTACT_EMAIL +
+            '?subject=' + encodeURIComponent(subject) +
+            '&body=' + encodeURIComponent(body);
+
+        if (btn) { btn.disabled = false; btn.innerHTML = original; }
+        succeeded(d.name);
     });
 }
 
 // ========== NEWSLETTER FORM ==========
-const newsletterForm = document.querySelector('.newsletter-form');
+/* newsletter form: handled in assets/jeevo-forms.js */
 
-if (newsletterForm) {
-    newsletterForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = newsletterForm.querySelector('input[type="email"]').value;
-
-        alert(`Thank you for subscribing with ${email}!`);
-        newsletterForm.reset();
-    });
-}
 
 // ========== SMOOTH SCROLL FOR ANCHOR LINKS ==========
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
@@ -245,3 +270,5 @@ window.addEventListener('load', () => {
 });
 
 console.log('🕉 Jeevo Tours & Travels - Website Loaded Successfully!');
+
+
